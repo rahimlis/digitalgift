@@ -544,31 +544,170 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        @media (max-width: 600px) {
+        /* Mobile Styles */
+        @media (max-width: 768px) {
             .container {
                 padding: 1rem;
+                max-width: 100%;
+            }
+            
+            .logo {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+                margin: 0 0.5rem;
+            }
+            
+            .form-input {
+                padding: 0.875rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .btn {
+                padding: 0.875rem;
+                font-size: 1rem;
             }
             
             .gift-box {
-                width: 250px;
-                height: 250px;
+                width: 220px;
+                height: 220px;
             }
 
             .celebration-text {
-                font-size: 2.5rem;
+                font-size: 2rem;
+                padding: 0 1rem;
+            }
+
+            .floating-text {
+                top: 8%;
+                padding: 0 1rem;
             }
 
             .floating-message {
-                font-size: 2rem;
+                font-size: 1.8rem;
+                line-height: 1.2;
             }
 
             .floating-recipient {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+            }
+
+            .download-section {
+                bottom: 8%;
+                padding: 0 1rem;
             }
 
             .download-btn {
-                padding: 1rem 2rem;
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .share-link {
+                font-size: 0.8rem;
+                padding: 0.6rem;
+            }
+
+            .copy-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Small Mobile Styles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+                margin: 0 0.25rem;
+            }
+            
+            .gift-box {
+                width: 180px;
+                height: 180px;
+            }
+
+            .celebration-text {
+                font-size: 1.5rem;
+            }
+
+            .floating-message {
+                font-size: 1.4rem;
+            }
+
+            .floating-recipient {
                 font-size: 1rem;
+            }
+
+            .download-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.85rem;
+            }
+
+            /* Reduce confetti and effects on small screens */
+            .confetti {
+                width: 8px;
+                height: 8px;
+            }
+
+            .firework {
+                width: 4px;
+                height: 4px;
+            }
+
+            .enhanced-sparkle {
+                width: 6px;
+                height: 6px;
+            }
+        }
+
+        /* Extra Small Mobile Styles */
+        @media (max-width: 360px) {
+            .gift-box {
+                width: 160px;
+                height: 160px;
+            }
+
+            .floating-message {
+                font-size: 1.2rem;
+            }
+
+            .floating-recipient {
+                font-size: 0.9rem;
+            }
+
+            .celebration-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (max-width: 768px) {
+            .gift-box {
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+            
+            .btn, .copy-btn, .download-btn {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+                min-height: 44px; /* iOS touch target size */
+            }
+            
+            .form-input {
+                -webkit-appearance: none;
+                border-radius: 12px;
             }
         }
     </style>
@@ -638,7 +777,7 @@
             <div class="sparkle"></div>
             <div class="sparkle"></div>
             
-            <p style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 1rem;">
+            <p style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 1rem;" id="instruction-text">
                 Click the gift box to open it!
             </p>
         </div>
@@ -656,6 +795,25 @@
             const giftId = giftMatch[1];
             loadGift(giftId);
         }
+
+        // Mobile-specific setup
+        function setupMobileExperience() {
+            const isMobile = window.innerWidth <= 768;
+            const instructionText = document.getElementById('instruction-text');
+            
+            if (isMobile && instructionText) {
+                instructionText.textContent = 'Tap the gift box to open it!';
+            }
+            
+            // Add touch event handling for better mobile interaction
+            if (isMobile) {
+                document.addEventListener('touchstart', function() {}, { passive: true });
+            }
+        }
+
+        // Call on page load and resize
+        window.addEventListener('load', setupMobileExperience);
+        window.addEventListener('resize', setupMobileExperience);
 
         // Form submission
         document.getElementById('gift-form').addEventListener('submit', async (e) => {
@@ -776,22 +934,28 @@
             celebrationText.textContent = '🎉 SURPRISE! 🎉';
             document.body.appendChild(celebrationText);
             
+            // Reduce animations on mobile for better performance
+            const isMobile = window.innerWidth <= 768;
+            const confettiCount = isMobile ? 50 : 100;
+            const fireworkCount = isMobile ? 10 : 20;
+            const sparkleCount = isMobile ? 15 : 30;
+            
             // Create confetti
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < confettiCount; i++) {
                 setTimeout(() => {
                     createConfetti();
                 }, i * 50);
             }
             
             // Create fireworks
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < fireworkCount; i++) {
                 setTimeout(() => {
                     createFirework();
                 }, i * 200);
             }
             
             // Create enhanced sparkles
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < sparkleCount; i++) {
                 setTimeout(() => {
                     createEnhancedSparkle();
                 }, i * 100);
@@ -911,14 +1075,52 @@
 
         function copyLink() {
             const shareLink = document.getElementById('share-link').textContent;
-            navigator.clipboard.writeText(shareLink).then(() => {
-                const copyBtn = document.querySelector('.copy-btn');
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = 'Copied!';
+            const copyBtn = document.querySelector('.copy-btn');
+            const originalText = copyBtn.textContent;
+            
+            // Modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(shareLink).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback for mobile devices
+                    fallbackCopyText(shareLink, copyBtn, originalText);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyText(shareLink, copyBtn, originalText);
+            }
+        }
+
+        function fallbackCopyText(text, button, originalText) {
+            // Create a temporary input element
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
                 setTimeout(() => {
-                    copyBtn.textContent = originalText;
+                    button.textContent = originalText;
                 }, 2000);
-            });
+            } catch (err) {
+                // If copy fails, show the link for manual copying
+                button.textContent = 'Copy failed - please select link above';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 3000);
+            }
+            
+            document.body.removeChild(textArea);
         }
     </script>
 </body>
