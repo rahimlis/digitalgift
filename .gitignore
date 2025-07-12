@@ -96,4 +96,8 @@ typings/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Docker
+.dockerignore
+docker-compose.override.yml 

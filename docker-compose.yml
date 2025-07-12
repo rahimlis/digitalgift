@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: digitalgift_db
+    environment:
+      POSTGRES_DB: digitalgift
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Application
+  app:
+    build: .
+    container_name: digitalgift_app
+    environment:
+      DATABASE_URL: postgresql://postgres:password123@postgres:5432/digitalgift
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./public:/app/public
+    restart: unless-stopped
+
+volumes:
+  postgres_data: 
