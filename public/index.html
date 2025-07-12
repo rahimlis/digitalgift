@@ -114,8 +114,8 @@
 
         .gift-box {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             margin: 2rem auto;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -256,8 +256,8 @@
 
         .sparkle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 6px;
+            height: 6px;
             background: #ffeb3b;
             border-radius: 50%;
             animation: sparkle 2s infinite ease-in-out;
@@ -266,11 +266,11 @@
         @keyframes sparkle {
             0%, 100% { 
                 opacity: 0; 
-                transform: scale(0);
+                transform: scale(0) rotate(0deg);
             }
             50% { 
                 opacity: 1; 
-                transform: scale(1);
+                transform: scale(1) rotate(180deg);
             }
         }
 
@@ -278,6 +278,131 @@
         .sparkle:nth-child(2) { top: 80%; left: 90%; animation-delay: 0.5s; }
         .sparkle:nth-child(3) { top: 40%; left: 85%; animation-delay: 1s; }
         .sparkle:nth-child(4) { top: 70%; left: 15%; animation-delay: 1.5s; }
+
+        /* Party Splash Animation */
+        .party-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, rgba(78,205,196,0.1) 50%, transparent 100%);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .party-overlay.active {
+            opacity: 1;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        .confetti:nth-child(2n) { background: #4ecdc4; }
+        .confetti:nth-child(3n) { background: #ffeb3b; }
+        .confetti:nth-child(4n) { background: #ff9800; }
+        .confetti:nth-child(5n) { background: #9c27b0; }
+        .confetti:nth-child(6n) { background: #2196f3; }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            animation: firework 2s ease-out infinite;
+        }
+
+        @keyframes firework {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .celebration-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            z-index: 1001;
+            opacity: 0;
+            animation: celebration-popup 3s ease-out;
+        }
+
+        @keyframes celebration-popup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            20% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        .enhanced-sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            animation: enhanced-sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes enhanced-sparkle {
+            0%, 100% { 
+                opacity: 0; 
+                transform: scale(0) rotate(0deg);
+                filter: blur(0px);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.5) rotate(180deg);
+                filter: blur(1px);
+            }
+        }
 
         .hidden {
             display: none;
@@ -334,8 +459,12 @@
             }
             
             .gift-box {
-                width: 150px;
-                height: 150px;
+                width: 250px;
+                height: 250px;
+            }
+
+            .celebration-text {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -506,12 +635,110 @@
             // Remove click handler after opening
             giftBox.onclick = null;
             
+            // Start party animation
+            startPartyAnimation();
+            
             // Add more sparkles
             setTimeout(() => {
                 for (let i = 0; i < 10; i++) {
                     createSparkle();
                 }
             }, 500);
+        }
+
+        function startPartyAnimation() {
+            // Create party overlay
+            const partyOverlay = document.createElement('div');
+            partyOverlay.className = 'party-overlay';
+            document.body.appendChild(partyOverlay);
+            
+            // Activate overlay
+            setTimeout(() => {
+                partyOverlay.classList.add('active');
+            }, 100);
+            
+            // Create celebration text
+            const celebrationText = document.createElement('div');
+            celebrationText.className = 'celebration-text';
+            celebrationText.textContent = '🎉 SURPRISE! 🎉';
+            document.body.appendChild(celebrationText);
+            
+            // Create confetti
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    createConfetti();
+                }, i * 50);
+            }
+            
+            // Create fireworks
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    createFirework();
+                }, i * 200);
+            }
+            
+            // Create enhanced sparkles
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    createEnhancedSparkle();
+                }, i * 100);
+            }
+            
+            // Remove party elements after animation
+            setTimeout(() => {
+                partyOverlay.remove();
+                celebrationText.remove();
+            }, 4000);
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                confetti.remove();
+            }, 6000);
+        }
+
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = Math.random() * 100 + 'vw';
+            firework.style.top = Math.random() * 100 + 'vh';
+            firework.style.animationDelay = Math.random() * 2 + 's';
+            
+            // Random colors for fireworks
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffeb3b', '#ff9800', '#9c27b0', '#2196f3'];
+            firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.boxShadow = `0 0 20px ${colors[Math.floor(Math.random() * colors.length)]}`;
+            
+            document.body.appendChild(firework);
+            
+            // Remove firework after animation
+            setTimeout(() => {
+                firework.remove();
+            }, 2000);
+        }
+
+        function createEnhancedSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'enhanced-sparkle';
+            sparkle.style.left = Math.random() * 100 + 'vw';
+            sparkle.style.top = Math.random() * 100 + 'vh';
+            sparkle.style.animationDelay = Math.random() * 1.5 + 's';
+            
+            document.body.appendChild(sparkle);
+            
+            // Remove sparkle after animation
+            setTimeout(() => {
+                sparkle.remove();
+            }, 3000);
         }
 
         function createSparkle() {
