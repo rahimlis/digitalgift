@@ -21,30 +21,49 @@ app.use(express.static('public'));
 
 // Database initialization
 async function initializeDB() {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS gifts (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                message TEXT NOT NULL,
-                recipient VARCHAR(255) NOT NULL,
-                drive_link TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                views INTEGER DEFAULT 0,
-                is_active BOOLEAN DEFAULT TRUE
-            );
-        `);
-        
-        // Create index for better performance
-        await pool.query(`
-            CREATE INDEX IF NOT EXISTS idx_gifts_created_at ON gifts(created_at DESC);
-        `);
-        
-        console.log('✅ Database initialized successfully');
-    } catch (error) {
-        console.error('❌ Error initializing database:', error);
-        process.exit(1);
+    const maxRetries = 10;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+        try {
+            console.log(`🔄 Attempting to connect to database (attempt ${retryCount + 1}/${maxRetries})...`);
+            
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS gifts (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    message TEXT NOT NULL,
+                    recipient VARCHAR(255) NOT NULL,
+                    drive_link TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    views INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT TRUE
+                );
+            `);
+            
+            // Create index for better performance
+            await pool.query(`
+                CREATE INDEX IF NOT EXISTS idx_gifts_created_at ON gifts(created_at DESC);
+            `);
+            
+            console.log('✅ Database initialized successfully');
+            return true;
+        } catch (error) {
+            retryCount++;
+            console.error(`❌ Error initializing database (attempt ${retryCount}/${maxRetries}):`, error.message);
+            
+            if (retryCount >= maxRetries) {
+                console.error('❌ Max database connection retries exceeded. Server will start but database operations may fail.');
+                return false;
+            }
+            
+            // Wait before retrying (exponential backoff)
+            const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+            console.log(`⏳ Waiting ${delay}ms before retry...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
     }
+    return false;
 }
 
 // Helper function to convert Google Drive share link to direct download
@@ -296,12 +315,28 @@ process.on('SIGINT', async () => {
 });
 
 // Initialize database and start server
-initializeDB().then(() => {
+initializeDB().then((dbInitialized) => {
     app.listen(PORT, () => {
         console.log(`🎁 PDF Gift Server running on port ${PORT}`);
         console.log(`🌐 Access your app at: http://localhost:${PORT}`);
-        console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'Connected' : 'Local'}`);
+        console.log(`🗄️  Database: ${dbInitialized ? 'Connected' : 'Connection Issues - Retrying in background'}`);
+        
+        // If database failed to initialize, try again in background
+        if (!dbInitialized) {
+            setTimeout(() => {
+                console.log('🔄 Retrying database initialization in background...');
+                initializeDB();
+            }, 5000);
+        }
+    });
+}).catch((error) => {
+    console.error('❌ Failed to initialize server:', error);
+    // Start server anyway
+    app.listen(PORT, () => {
+        console.log(`🎁 PDF Gift Server running on port ${PORT} (Database connection pending)`);
+        console.log(`🌐 Access your app at: http://localhost:${PORT}`);
+        console.log(`⚠️  Database: Connection failed - Some features may not work`);
     });
 });
 
-module.exports = app;
+module.exports = app;   
