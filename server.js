@@ -316,7 +316,7 @@ process.on('SIGINT', async () => {
 
 // Initialize database and start server
 initializeDB().then((dbInitialized) => {
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`🎁 PDF Gift Server running on port ${PORT}`);
         console.log(`🌐 Access your app at: http://localhost:${PORT}`);
         console.log(`🗄️  Database: ${dbInitialized ? 'Connected' : 'Connection Issues - Retrying in background'}`);
@@ -332,7 +332,7 @@ initializeDB().then((dbInitialized) => {
 }).catch((error) => {
     console.error('❌ Failed to initialize server:', error);
     // Start server anyway
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`🎁 PDF Gift Server running on port ${PORT} (Database connection pending)`);
         console.log(`🌐 Access your app at: http://localhost:${PORT}`);
         console.log(`⚠️  Database: Connection failed - Some features may not work`);
