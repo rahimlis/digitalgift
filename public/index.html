@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Gift - Share Documents Beautifully</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .gift-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.05);
+        }
+
+        .box-base {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.6s ease;
+        }
+
+        .box-lid {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: 60px;
+            background: linear-gradient(45deg, #ff8e8e, #6dd5d1);
+            border-radius: 15px 15px 8px 8px;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: bottom;
+        }
+
+        .ribbon-horizontal {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(90deg, #ffeb3b, #ffc107);
+            transform: translateY(-50%);
+            border-radius: 10px;
+        }
+
+        .ribbon-vertical {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(180deg, #ffeb3b, #ffc107);
+            transform: translateX(-50%);
+            border-radius: 10px;
+        }
+
+        .bow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .bow::before,
+        .bow::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 25px;
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 2px;
+        }
+
+        .bow::before {
+            left: -15px;
+            transform: rotate(-30deg);
+        }
+
+        .bow::after {
+            right: -15px;
+            transform: rotate(30deg);
+        }
+
+        .gift-box.opening .box-lid {
+            transform: rotateX(-180deg) translateZ(60px);
+        }
+
+        .gift-box.opening .bow {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-50px) rotate(360deg);
+        }
+
+        .gift-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: all 0.5s ease 0.8s;
+        }
+
+        .gift-box.opening .gift-content {
+            opacity: 1;
+        }
+
+        .gift-message {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .gift-recipient {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .download-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            animation: sparkle 2s infinite ease-in-out;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { 
+                opacity: 0; 
+                transform: scale(0);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+        }
+
+        .sparkle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 80%; left: 90%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { top: 40%; left: 85%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { top: 70%; left: 15%; animation-delay: 1.5s; }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #4caf50;
+        }
+
+        .share-link {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin-bottom: 1rem;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .gift-box {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎁 PDF Gift</div>
+
+        <!-- Creator View -->
+        <div id="creator-view" class="card fade-in">
+            <form id="gift-form">
+                <div class="form-group">
+                    <label class="form-label">Gift Message</label>
+                    <input type="text" class="form-input" id="message" placeholder="Your special message..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Recipient Name</label>
+                    <input type="text" class="form-input" id="recipient" placeholder="Who is this for?" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Google Drive PDF Link</label>
+                    <input type="url" class="form-input" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
+                </div>
+
+                <button type="submit" class="btn" id="create-btn">
+                    Create Gift
+                </button>
+            </form>
+        </div>
+
+        <!-- Success View -->
+        <div id="success-view" class="card fade-in hidden">
+            <div class="success-message">
+                🎉 Gift created successfully!
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Share this link with your recipient:</label>
+                <div class="share-link" id="share-link"></div>
+                <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+            </div>
+
+            <button class="btn" onclick="createAnother()">
+                Create Another Gift
+            </button>
+        </div>
+
+        <!-- Receiver View -->
+        <div id="receiver-view" class="card fade-in hidden">
+            <div class="gift-box" id="gift-box" onclick="openGift()">
+                <div class="box-base">
+                    <div class="ribbon-horizontal"></div>
+                    <div class="ribbon-vertical"></div>
+                </div>
+                <div class="box-lid"></div>
+                <div class="bow"></div>
+                <div class="gift-content">
+                    <div class="gift-message" id="gift-message-display"></div>
+                    <div class="gift-recipient" id="gift-recipient-display"></div>
+                    <a href="#" class="download-btn" id="download-link" target="_blank">
+                        Download PDF
+                    </a>
+                </div>
+            </div>
+            
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            
+            <p style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 1rem;">
+                Click the gift box to open it!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // API base URL - change this to your deployed backend URL
+        const API_BASE = window.location.origin;
+        
+        // Check if this is a gift link
+        const urlPath = window.location.pathname;
+        const giftMatch = urlPath.match(/\/gift\/([a-f0-9-]+)/);
+        
+        if (giftMatch) {
+            const giftId = giftMatch[1];
+            loadGift(giftId);
+        }
+
+        // Form submission
+        document.getElementById('gift-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const createBtn = document.getElementById('create-btn');
+            const originalText = createBtn.textContent;
+            
+            createBtn.textContent = 'Creating...';
+            createBtn.disabled = true;
+            
+            try {
+                const formData = {
+                    message: document.getElementById('message').value,
+                    recipient: document.getElementById('recipient').value,
+                    driveLink: document.getElementById('driveLink').value
+                };
+                
+                const response = await fetch(`${API_BASE}/api/gifts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(data.shareUrl);
+                } else {
+                    alert(data.error || 'Error creating gift');
+                }
+            } catch (error) {
+                alert('Error creating gift: ' + error.message);
+            } finally {
+                createBtn.textContent = originalText;
+                createBtn.disabled = false;
+            }
+        });
+
+        function showSuccess(shareUrl) {
+            document.getElementById('creator-view').classList.add('hidden');
+            document.getElementById('success-view').classList.remove('hidden');
+            document.getElementById('share-link').textContent = shareUrl;
+        }
+
+        function createAnother() {
+            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('creator-view').classList.remove('hidden');
+            document.getElementById('gift-form').reset();
+        }
+
+        async function loadGift(giftId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/gifts/${giftId}`);
+                const gift = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('creator-view').classList.add('hidden');
+                    document.getElementById('receiver-view').classList.remove('hidden');
+                    
+                    document.getElementById('gift-message-display').textContent = gift.message;
+                    document.getElementById('gift-recipient-display').textContent = `For ${gift.recipient}`;
+                    document.getElementById('download-link').href = gift.driveLink;
+                } else {
+                    alert(gift.error || 'Gift not found');
+                }
+            } catch (error) {
+                alert('Error loading gift: ' + error.message);
+            }
+        }
+
+        function openGift() {
+            const giftBox = document.getElementById('gift-box');
+            giftBox.classList.add('opening');
+            
+            // Remove click handler after opening
+            giftBox.onclick = null;
+            
+            // Add more sparkles
+            setTimeout(() => {
+                for (let i = 0; i < 10; i++) {
+                    createSparkle();
+                }
+            }, 500);
+        }
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            
+            document.getElementById('receiver-view').appendChild(sparkle);
+            
+            // Remove sparkle after animation
+            setTimeout(() => {
+                sparkle.remove();
+            }, 2000);
+        }
+
+        function copyLink() {
+            const shareLink = document.getElementById('share-link').textContent;
+            navigator.clipboard.writeText(shareLink).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
